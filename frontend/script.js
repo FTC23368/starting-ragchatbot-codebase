@@ -120,12 +120,31 @@ function addMessage(content, type, sources = null, isWelcome = false) {
     const displayContent = type === 'assistant' ? marked.parse(content) : escapeHtml(content);
     
     let html = `<div class="message-content">${displayContent}</div>`;
-    
+
     if (sources && sources.length > 0) {
+        // Build sources HTML with links as individual badges
+        const sourcesHtml = sources.map(source => {
+            // Handle both old string format (backward compatibility) and new object format
+            if (typeof source === 'string') {
+                // Backward compatibility: plain text badge
+                return `<span class="source-badge">${escapeHtml(source)}</span>`;
+            } else {
+                // New format: object with text and optional link
+                const text = escapeHtml(source.text);
+                if (source.link) {
+                    // Clickable link badge opens in new tab
+                    return `<a href="${escapeHtml(source.link)}" target="_blank" rel="noopener noreferrer" class="source-badge source-link">${text}</a>`;
+                } else {
+                    // No link available - show as plain badge
+                    return `<span class="source-badge">${text}</span>`;
+                }
+            }
+        }).join('');
+
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">${sourcesHtml}</div>
             </details>
         `;
     }
