@@ -11,6 +11,22 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from vector_store import SearchResults
 
 
+# ── Shared mock RAG system fixture ──────────────────────────────────
+
+
+@pytest.fixture
+def mock_rag_system():
+    """Fully mocked RAGSystem suitable for API-level tests."""
+    rag = Mock()
+    rag.query.return_value = ("This is the answer.", [{"text": "Source 1", "link": None}])
+    rag.session_manager.create_session.return_value = "session_1"
+    rag.get_course_analytics.return_value = {
+        "total_courses": 3,
+        "course_titles": ["Intro to APIs", "MCP Course", "Python Basics"],
+    }
+    return rag
+
+
 @pytest.fixture
 def mock_vector_store():
     """Mock VectorStore with default empty search results."""
