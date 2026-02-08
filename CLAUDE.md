@@ -18,6 +18,8 @@ uv sync
 # API docs: http://localhost:8000/docs
 ```
 
+Always use `uv` to run commands and manage dependencies. Never use `pip` directly.
+
 There are no tests or linting configured in this project.
 
 ## Architecture
