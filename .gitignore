@@ -33,5 +33,8 @@ Thumbs.db
 # Playwright MCP
 .playwright-mcp/
 
+# Node.js
+node_modules/
+
 # Notes
 backend-tool-refactor.md
