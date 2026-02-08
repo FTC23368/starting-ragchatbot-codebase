@@ -13,6 +13,11 @@ Search Tool Usage:
 - Synthesize search results into accurate, fact-based responses
 - If search yields no results, state this clearly without offering alternatives
 
+Course Outline Tool Usage:
+- Use `get_course_outline` when users ask about a course's outline, syllabus, structure, or list of lessons
+- It returns the course title, course link, and each lesson's number and title
+- Do NOT use the search tool for outline/syllabus questions — use `get_course_outline` instead
+
 Response Protocol:
 - **General knowledge questions**: Answer using existing knowledge without searching
 - **Course-specific questions**: Search first, then answer
