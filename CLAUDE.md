@@ -65,3 +65,68 @@ Lesson Link: [url]
 ### Configuration
 
 All settings in `backend/config.py` via `Config` dataclass. API key loaded from `.env` in project root.
+
+## Code Review Guidelines (for Claude Code Review)
+
+When reviewing code in this repository, please check for:
+
+### Python Backend (`backend/`)
+
+**Critical checks:**
+- API key handling: Ensure `ANTHROPIC_API_KEY` is never logged or exposed
+- Error handling: API calls should have proper try-except blocks
+- Input validation: All user inputs in `/api/query` endpoint must be validated
+- ChromaDB operations: Verify collection names and error handling
+
+**Code quality:**
+- Use type hints for function parameters and return values
+- Follow PEP 8 style guidelines
+- Keep functions focused and under 50 lines when possible
+- Document complex logic with comments
+
+**Security considerations:**
+- No hardcoded secrets or API keys
+- Validate all user inputs (especially `query` and `session_id`)
+- Sanitize course content before storing in vector DB
+- Use proper CORS settings in FastAPI
+
+**Performance:**
+- ChromaDB queries should specify `n_results` appropriately
+- Large document processing should be chunked
+- Session history should be properly limited (currently `MAX_HISTORY * 2`)
+
+### Frontend (`frontend/`)
+
+**Critical checks:**
+- API endpoint calls should have error handling
+- User input sanitization before sending to backend
+- Loading states for async operations
+- Proper DOM manipulation (avoid XSS vulnerabilities)
+
+**Code quality:**
+- Use modern JavaScript (ES6+)
+- Keep functions pure and testable
+- Consistent naming conventions
+- Add comments for complex UI logic
+
+**UX considerations:**
+- Loading indicators for API calls
+- Error messages should be user-friendly
+- Responsive design considerations
+- Accessibility (ARIA labels, keyboard navigation)
+
+### Testing Requirements
+
+When adding new features:
+- **Backend:** Add pytest tests for new endpoints and functions
+- **Frontend:** Consider adding basic JavaScript tests for core functions
+- **Integration:** Test full query flow from frontend to backend
+- **Edge cases:** Test with empty inputs, long queries, invalid session IDs
+
+### Documentation Standards
+
+Code changes should include:
+- Update CLAUDE.md if architecture changes
+- Update README.md if user-facing features change
+- Add docstrings for public functions
+- Comment complex algorithms or business logic

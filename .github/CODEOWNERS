@@ -1,0 +1,19 @@
+# CODEOWNERS file
+# This file defines who should be automatically requested for review when files change
+
+# Default owner for everything in the repo
+* @FTC23368
+
+# Backend Python code
+/backend/ @FTC23368
+
+# Frontend code
+/frontend/ @FTC23368
+
+# Configuration and documentation
+/CLAUDE.md @FTC23368
+/README.md @FTC23368
+/.github/ @FTC23368
+
+# Course materials
+/docs/ @FTC23368

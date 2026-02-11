@@ -1,0 +1,81 @@
+name: Claude Code Integration Helper
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+jobs:
+  pr-summary:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate PR context
+      id: pr-context
+      run: |
+        echo "## PR Context for @Claude Code" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Files changed:** ${{ github.event.pull_request.changed_files }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Additions:** +${{ github.event.pull_request.additions }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Deletions:** -${{ github.event.pull_request.deletions }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Changed Files" >> $GITHUB_STEP_SUMMARY
+        git diff --name-only origin/${{ github.base_ref }}..HEAD >> $GITHUB_STEP_SUMMARY
+
+    - name: Comment with Claude Code tips
+      uses: actions/github-script@v7
+      if: github.event.action == 'opened'
+      with:
+        script: |
+          const body = `## 🤖 Claude Code Integration Active
+
+          This PR is ready for AI-assisted review! You can:
+
+          - **Get a code review:** \`@Claude Code please review this PR\`
+          - **Ask questions:** \`@Claude Code what does this function do?\`
+          - **Get suggestions:** \`@Claude Code how can I improve the performance here?\`
+          - **Check security:** \`@Claude Code are there any security concerns?\`
+          - **Improve tests:** \`@Claude Code suggest test cases for this change\`
+
+          Claude Code has access to the project's CLAUDE.md for context about architecture and conventions.`;
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: body
+          });
+
+  validate-changes:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Check for sensitive files
+      run: |
+        if git diff --name-only origin/${{ github.base_ref }}..HEAD | grep -E '\.env|api.*key|secret|password|token'; then
+          echo "⚠️  Warning: Potential sensitive files detected. Please review carefully."
+          echo "sensitive_files=true" >> $GITHUB_OUTPUT
+        fi
+      id: sensitive-check
+      continue-on-error: true
+
+    - name: Validate CLAUDE.md if changed
+      run: |
+        if git diff --name-only origin/${{ github.base_ref }}..HEAD | grep 'CLAUDE.md'; then
+          echo "📝 CLAUDE.md has been modified. This will affect Claude Code's behavior."
+          echo "Please ensure the changes are intentional and well-documented."
+        fi
